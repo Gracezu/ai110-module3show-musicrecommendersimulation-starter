@@ -89,6 +89,70 @@ Target Profile: POP | HAPPY
    Why: Exact mood match (+1.0), Energy match (+0.96), Acousticness match (+0.85)
 
 ---
+![alt text](image.png)
+
+Initializing PawPal Recommender System...
+Loaded songs: 25
+
+=== Testing Profile: High-Energy Pop ===
+Target: POP | HAPPY | Target Energy: 0.9
+--------------------------------------------------
+#1 | Sunrise City by Neon Echo
+   Score: 4.84/5.00
+   Why: Exact genre match (+2.0), Exact mood match (+1.0), Energy match (+0.92), Acousticness match (+0.92)
+#2 | Gym Hero by Max Pulse
+   Score: 3.92/5.00
+   Why: Exact genre match (+2.0), Energy match (+0.97), Acousticness match (+0.95)
+#3 | Rooftop Lights by Indigo Parade
+   Score: 2.61/5.00
+   Why: Exact mood match (+1.0), Energy match (+0.86), Acousticness match (+0.75)
+#4 | Storm Runner by Voltline
+   Score: 1.99/5.00
+   Why: Energy match (+0.99), Acousticness match (+1.00)
+#5 | Midnight Synth by Digital Avenue
+   Score: 1.97/5.00
+   Why: Energy match (+0.99), Acousticness match (+0.98)
+
+
+=== Testing Profile: Chill Lofi ===
+Target: LOFI | CHILL | Target Energy: 0.3
+--------------------------------------------------
+#1 | Library Rain by Paper Lanterns
+   Score: 4.94/5.00
+   Why: Exact genre match (+2.0), Exact mood match (+1.0), Energy match (+0.95), Acousticness match (+0.99)
+#2 | Midnight Coding by LoRoom
+   Score: 4.74/5.00
+   Why: Exact genre match (+2.0), Exact mood match (+1.0), Energy match (+0.88), Acousticness match (+0.86)
+#3 | Focus Flow by LoRoom
+   Score: 3.83/5.00
+   Why: Exact genre match (+2.0), Energy match (+0.90), Acousticness match (+0.93)
+#4 | Spacewalk Thoughts by Orbit Bloom
+   Score: 2.91/5.00
+   Why: Exact mood match (+1.0), Energy match (+0.98), Acousticness match (+0.93)
+#5 | Whiskey Road by Heartland Drive
+   Score: 1.92/5.00
+   Why: Energy match (+0.92), Acousticness match (+1.00)
+
+
+=== Testing Profile: Deep Intense Rock (Adversarial) ===
+Target: ROCK | SAD | Target Energy: 0.95
+--------------------------------------------------
+#1 | Storm Runner by Voltline
+   Score: 3.91/5.00
+   Why: Exact genre match (+2.0), Energy match (+0.96), Acousticness match (+0.95)
+#2 | Gym Hero by Max Pulse
+   Score: 1.98/5.00
+   Why: Energy match (+0.98), Acousticness match (+1.00)
+#3 | Thunder Forge by Iron Bastion
+   Score: 1.96/5.00
+   Why: Energy match (+0.99), Acousticness match (+0.97)
+#4 | Midnight Synth by Digital Avenue
+   Score: 1.89/5.00
+   Why: Energy match (+0.96), Acousticness match (+0.93)
+#5 | Neon Break by Street Pulse
+   Score: 1.86/5.00
+   Why: Energy match (+0.93), Acousticness match (+0.93)
+
 
 ## Getting Started
 
@@ -156,10 +220,14 @@ Read and complete `model_card.md`:
 [**Model Card**](model_card.md)
 
 Write 1 to 2 paragraphs here about what you learned:
-
 - about how recommenders turn data into predictions
 - about where bias or unfairness could show up in systems like this
 
+`High-Energy Pop vs. Chill Lofi`: The difference between these two profiles was stark but expected. The High-Energy Pop profile heavily penalized acoustic tracks, ensuring fast-paced, high-energy digital beats rose to the top. Conversely, the Chill Lofi profile's output shifted dramatically toward low-energy, highly acoustic tracks (like guitars or pianos). It makes sense because their target energy and acousticness levels are exact opposites, proving the numerical distance math works perfectly for standard, straightforward profiles.
+
+`High-Energy Pop vs. Deep Intense Rock (Adversarial)`: To explain this to a non-programmer: Imagine a user wanting a "Gym Hero" workout song (extremely high energy) but with a "sad" or "intense" vibe. Originally, the system kept recommending slow, sad rock songs just because they matched the text tags for "rock" and "sad," completely ignoring that a slow song is terrible for a workout! 
+
+By adjusting the weights in my experiment to prioritize the `energy score` over the `genre label`, the algorithm learned to prioritize the actual fast-paced sound of the song. It stopped forcing slow rock songs on the user and started recommending intense, high-energy tracks that actually fit the physical vibe the user requested, even if the genre wasn't a perfect 1-to-1 match.
 
 ---
 
