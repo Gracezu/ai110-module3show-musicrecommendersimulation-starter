@@ -9,26 +9,39 @@ You will implement the functions in recommender.py:
 - recommend_songs
 """
 
-from recommender import load_songs, recommend_songs
+from pathlib import Path
+from src.recommender import load_songs, recommend_songs
 
+def main():
+    print("Initializing PawPal Recommender System...")
+    
+    # 1. Load the data
+    filepath = Path(__file__).resolve().parents[1] / "data" / "songs.csv"
+    songs = load_songs(str(filepath))
+    print(f"Loaded songs: {len(songs)}\n")
 
-def main() -> None:
-    songs = load_songs("data/songs.csv") 
+    # 2. Define a default user profile
+    user_prefs = {
+        "favorite_genre": "pop",
+        "favorite_mood": "happy",
+        "target_energy": 0.80,
+        "target_acousticness": 0.20
+    }
 
-    # Starter example profile
-    user_prefs = {"genre": "pop", "mood": "happy", "energy": 0.8}
+    print(f"Target Profile: {user_prefs['favorite_genre'].upper()} | {user_prefs['favorite_mood'].upper()}\n")
+    print("-" * 50)
 
-    recommendations = recommend_songs(user_prefs, songs, k=5)
+    # 3. Get recommendations
+    top_k = 3
+    recommendations = recommend_songs(user_prefs, songs, k=top_k)
 
-    print("\nTop recommendations:\n")
-    for rec in recommendations:
-        # You decide the structure of each returned item.
-        # A common pattern is: (song, score, explanation)
-        song, score, explanation = rec
-        print(f"{song['title']} - Score: {score:.2f}")
-        print(f"Because: {explanation}")
-        print()
-
+    # 4. Print results neatly
+    for i, rec in enumerate(recommendations, 1):
+        song = rec['song']
+        print(f"#{i} | {song['title']} by {song['artist']}")
+        print(f"   Score: {rec['score']:.2f}/5.00")
+        print(f"   Why: {', '.join(rec['reasons'])}")
+        print("-" * 50)
 
 if __name__ == "__main__":
     main()
