@@ -2,110 +2,54 @@
 
 ## 1. Model Name  
 
-Give your model a short, descriptive name.  
-Example: **VibeFinder 1.0**  
-
----
+**VibeFinder 1.0** ---
 
 ## 2. Intended Use  
 
-Describe what your recommender is designed to do and who it is for. 
+This recommender is designed to suggest songs based on a user's specific acoustic preferences and mood. It assumes the user knows exactly what they want in terms of energy level, acousticness, and genre. This model is built for classroom exploration and simulation to understand content-based filtering. It is **not** intended for commercial use or for replacing real dynamic recommenders (like Spotify), as it relies on a tiny, static dataset and explicit manual inputs rather than learning from user listening habits.
 
-Prompts:  
-
-- What kind of recommendations does it generate  
-- What assumptions does it make about the user  
-- Is this for real users or classroom exploration  
-
----
 
 ## 3. How the Model Works  
 
-Explain your scoring approach in simple language.  
+VibeFinder 1.0 uses a "Content-Based Filtering" approach. It compares the features of every song (genre, mood, energy, and acousticness) against the user's ideal taste profile. 
 
-Prompts:  
+The model acts like a judge scoring a routine out of 5.0 points:
+- It awards points for exact text matches (e.g., +1.0 for the right genre, +1.0 for the right mood).
+- It calculates "distance" for numbers. If a user wants 0.8 energy and the song is 0.7, it deducts a small amount of points for being slightly off. 
+- During testing, I changed the starter logic to cut the genre weight in half and double the energy weight. This ensures the system prioritizes the actual "sound" of the music over the text label.
 
-- What features of each song are used (genre, energy, mood, etc.)  
-- What user preferences are considered  
-- How does the model turn those into a score  
-- What changes did you make from the starter logic  
-
-Avoid code here. Pretend you are explaining the idea to a friend who does not program.
-
----
 
 ## 4. Data  
 
-Describe the dataset the model uses.  
-
-Prompts:  
-
-- How many songs are in the catalog  
-- What genres or moods are represented  
-- Did you add or remove data  
-- Are there parts of musical taste missing in the dataset  
-
----
+The dataset uses a highly simplified catalog of only 10 songs stored in a `songs.csv` file. It features a very basic spread of genres (Pop, Lofi, Rock) and moods (Happy, Chill, Sad). Because the dataset is so small, it is missing massive parts of musical taste, including hip-hop, classical, EDM, and global music. It also lacks temporal data (like release year) which is a huge factor in real musical taste.
 
 ## 5. Strengths  
 
-Where does your system seem to work well  
+The system works incredibly well for straightforward user profiles. If a user wants "high-energy pop" or "low-energy acoustic lofi," the math beautifully pushes the exact right songs to the top of the list. The linear distance calculation handles opposite preferences perfectly, ensuring that a user looking for a relaxing acoustic track is never accidentally recommended a loud digital dance track. 
 
-Prompts:  
-
-- User types for which it gives reasonable results  
-- Any patterns you think your scoring captures correctly  
-- Cases where the recommendations matched your intuition  
-
----
 
 ## 6. Limitations and Bias 
 
-Where the system struggles or behaves unfairly. 
+The current scoring logic exhibits a strict "filter bubble" bias regarding categorical data. Because the system relies heavily on exact string matching for genre and mood, it unfairly penalizes tracks that are functionally identical but tagged slightly differently (e.g., scoring 0 points for an "indie pop" track when the user wants "pop"). Furthermore, calculating the energy gap via linear absolute distance assumes perfectly symmetrical preferences. In reality, a user looking for a high-intensity workout song (0.80 energy) might be perfectly happy being recommended a 0.95 energy song, but absolutely hate a 0.65 energy song, even though both are mathematically separated by exactly 0.15 points from their target.
 
-Prompts:  
-
-- Features it does not consider  
-- Genres or moods that are underrepresented  
-- Cases where the system overfits to one preference  
-- Ways the scoring might unintentionally favor some users  
-
----
 
 ## 7. Evaluation  
 
-How you checked whether the recommender behaved as expected. 
+I tested the system using a CLI simulation with three distinct user profiles: "High-Energy Pop", "Chill Lofi", and an adversarial "Deep Intense Rock" profile. 
 
-Prompts:  
+What surprised me the most was how the adversarial profile (which wanted a "sad" mood but exceptionally high energy) exposed a major flaw in my original logic. Because the system initially weighted genre matches so heavily (+2.0 points), it kept recommending slow, sad rock songs to this profile, completely ignoring the user's demand for high energy. It taught me that strict category matching (like genre) can easily overpower the actual "vibe" or mathematical sound of the music, leading to bad recommendations for users with unique or conflicting tastes.
 
-- Which user profiles you tested  
-- What you looked for in the recommendations  
-- What surprised you  
-- Any simple tests or comparisons you ran  
-
-No need for numeric metrics unless you created some.
-
----
 
 ## 8. Future Work  
 
-Ideas for how you would improve the model next.  
+If I were to keep developing this project, I would:
+1. **Fuzzy Text Matching:** Allow the system to recognize that "indie rock" and "rock" are similar and award partial points, rather than a hard zero.
+2. **Expand the Dataset:** Connect the system to the real Spotify API to test it against millions of songs rather than just 10.
+3. **Hybrid Filtering:** Add a "Collaborative Filtering" element so the system can recommend songs based on what *other* similar users are listening to, rather than just relying on math.
 
-Prompts:  
-
-- Additional features or preferences  
-- Better ways to explain recommendations  
-- Improving diversity among the top results  
-- Handling more complex user tastes  
-
----
 
 ## 9. Personal Reflection  
 
-A few sentences about your experience.  
+My biggest learning moment during this project was realizing how easily a rigid algorithm can fail when faced with conflicting human preferences (like wanting "sad" but "high energy" music). It was surprising to see how just a few lines of basic math (addition and absolute distance) could actually "feel" like a personalized recommendation engine when the data aligned perfectly. 
 
-Prompts:  
-
-- What you learned about recommender systems  
-- Something unexpected or interesting you discovered  
-- How this changed the way you think about music recommendation apps  
+Using AI tools like Copilot was incredibly helpful for generating edge-case testing profiles and writing the boilerplate Python code. However, I had to double-check the AI heavily during the weight-shifting experiment. The AI suggested the syntax, but *I* had to evaluate the actual output to determine if the math was producing recommendations that made logical sense to a human ear. This project totally changed how I view apps like Spotify; I now realize their "magic" is just thousands of weighted data points battling it out behind the scenes.

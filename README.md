@@ -23,11 +23,70 @@ Some prompts to answer:
 
 - What features does each `Song` use in your system
   - For example: genre, mood, energy, tempo
-- What information does your `UserProfile` store
-- How does your `Recommender` compute a score for each song
-- How do you choose which songs to recommend
+Each song in this system uses two primary numerical features: mood and danceability. Both of these attributes are measured on a normalized scale from 0.0 to 1.0 so they can be evaluated equally.
 
-You can include a simple diagram or bullet list if helpful.
+- What information does your `UserProfile` store
+The user profile stores the listener's ideal target values for both mood and danceability, representing their specific acoustic preferences. It also stores the mathematical weights assigned to each feature, which determine if the user currently cares more about matching the mood or matching the danceability.
+
+- How does your `Recommender` compute a score for each song
+The recommender calculates the absolute distance between the song's features and the user's preferred values to determine exactly how far apart they are. It then converts that distance into a similarity score (using a formula like 1 - distance), ensuring that songs closer to the user's exact preference point receive a higher score.
+
+- How do you choose which songs to recommend
+The system calculates a final, weighted score for every song in the catalog and ranks them from highest to lowest. It then selects and recommends the songs at the very top of this ranked list because they are the tightest match to the user's desired profile.
+
+
+## How The System Works
+
+The recommendation engine uses a Content-Based Filtering approach. It compares the attributes of every song in our database (`songs.csv`) against a predefined user profile to calculate a "Similarity Score."
+
+### The Algorithm Recipe
+The system uses a weighted point system (max score of 5.0) to balance exact category matches with numerical feature similarity:
+1. Genre Match: +2.0 points if the genre matches the user's favorite.
+2. Mood Match: +1.0 point if the mood matches the user's favorite.
+3. Energy Proximity:Up to +1.0 point based on how close the song's energy level is to the user's target `(1.0 - absolute difference)`.
+4. Acoustic Proximity: Up to +1.0 point based on how close the song's acousticness is to the user's target `(1.0 - absolute difference)`.
+
+### Data Flow Diagram
+
+```mermaid
+flowchart TD
+    A[User Profile] --> C
+    B[songs.csv Catalog] --> C
+    
+    C{For Every Song in Catalog}
+    C -->|Calculate Categorical Points| D[Check Genre & Mood Match]
+    C -->|Calculate Numerical Similarity| E[Compute Distance for Energy & Acousticness]
+    
+    D --> F[Sum Total Score]
+    E --> F
+    
+    F --> G[Append Song + Score to Results List]
+    
+    G --> H{All songs checked?}
+    H -->|No| C
+    H -->|Yes| I[Sort List by Highest Score]
+    
+    I --> J[Output Top K Recommendations]
+
+![alt text](image-2.png)
+
+Initializing PawPal Recommender System...
+Loaded songs: 25
+
+Target Profile: POP | HAPPY
+
+--------------------------------------------------
+#1 | Sunrise City by Neon Echo
+   Score: 4.96/5.00
+   Why: Exact genre match (+2.0), Exact mood match (+1.0), Energy match (+0.98), Acousticness match (+0.98)
+--------------------------------------------------
+#2 | Gym Hero by Max Pulse
+   Score: 3.72/5.00
+   Why: Exact genre match (+2.0), Energy match (+0.87), Acousticness match (+0.85)
+--------------------------------------------------
+#3 | Rooftop Lights by Indigo Parade
+   Score: 2.81/5.00
+   Why: Exact mood match (+1.0), Energy match (+0.96), Acousticness match (+0.85)
 
 ---
 
